@@ -24,7 +24,7 @@ export default function ReturnPolicyPage() {
         {
           title: "Refund Guideline",
           points: [
-            "If you cancel your order after 24 hours, a 10% cancellation fee will be deducted from the refund amount.",
+            "If you cancel your order after 1 hour, a 10% cancellation fee will be deducted from the refund amount.",
             "You will receive a confirmation email when processing starts."
           ]
         }

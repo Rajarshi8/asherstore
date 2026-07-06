@@ -24,6 +24,17 @@ export default function ContactUsPage() {
 
         <section className="mt-6 rounded-xl border border-white/10 bg-zinc-950/60 p-4" aria-label="Contact details">
           <p className="text-sm text-zinc-300">
+            Instagram:{" "}
+            <a
+              className="text-rose-300 hover:text-rose-200"
+              href="https://www.instagram.com/theasher.store/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              @theasher.store
+            </a>
+          </p>
+          <p className="mt-2 text-sm text-zinc-300">
             Email: <a className="text-rose-300 hover:text-rose-200" href="mailto:theasherstoresupport@gmail.com">theasherstoresupport@gmail.com</a>
           </p>
           <p className="mt-2 text-sm text-zinc-300">Phone: +91 79809 18650</p>
@@ -41,7 +52,9 @@ export default function ContactUsPage() {
 
         <div className="mt-8 flex flex-wrap gap-3">
           <a
-            href="tel:+917980918650"
+            href="https://wa.me/917980918650"
+            target="_blank"
+            rel="noopener noreferrer"
             className="rounded-lg border border-white/20 px-4 py-2 text-sm font-semibold text-zinc-200 hover:border-white/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
           >
             Contact number

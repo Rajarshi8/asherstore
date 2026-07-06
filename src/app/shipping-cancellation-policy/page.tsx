@@ -26,12 +26,12 @@ export default function ShippingCancellationPolicyPage() {
           title: "Cancellation",
           points: [
             "Orders can be cancelled before dispatch confirmation.",
-            "If you cancel your order after 24 hours, a 10% cancellation fee will be deducted from the refund amount.",
+            "If you cancel your order after 1 hour, a 10% cancellation fee will be deducted from the refund amount.",
             "Refunds for valid cancellations are issued to the original payment method."
           ]
         }
       ]}
-      primaryCta={{ label: "Track or Review Orders", href: "/dashboard" }}
+      primaryCta={{ label: "Start Cancellation", href: "/dashboard" }}
     />
   );
 }

@@ -22,7 +22,7 @@ const faqs = [
   {
     question: "How to track order?",
     answer:
-      "Once your order is dispatched, you will receive a tracking ID. You can use it in the AWB section on the Delhivery website to track your order."
+      "Once your order is dispatched, you will receive a tracking id. You can use it in our websites track order section."
   },
   {
     question: "What size should I order?",
