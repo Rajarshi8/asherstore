@@ -20,6 +20,7 @@ export default function ProductDetailPage() {
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
   const [ordering, setOrdering] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   const addToCart = useShopStore((state) => state.addToCart);
   const addRecentlyViewed = useShopStore((state) => state.addRecentlyViewed);
@@ -130,33 +131,62 @@ export default function ProductDetailPage() {
     return <div className="mx-auto w-full max-w-7xl px-4 py-10 text-zinc-400">Loading product...</div>;
   }
 
+  const currentImageSrc = resolveProductImageSrc(product.images[selectedImageIndex] || product.images[0]);
+
   return (
     <div className="mx-auto grid w-full max-w-7xl gap-8 px-4 py-8 md:grid-cols-2 md:px-6">
-      <div className="space-y-3">
-        <div className="overflow-hidden rounded-2xl border border-white/10 bg-zinc-900">
-          <div className="relative h-[420px] w-full">
-            <Image
-              src={resolveProductImageSrc(product.images[0])}
-              alt={product.name}
-              fill
-              sizes="(max-width: 768px) 100vw, 50vw"
-              className="object-cover"
-            />
+      {/* Product Image Gallery - Full uncropped jersey view */}
+      <div className="space-y-4">
+        {/* Main Hero Product Image Canvas */}
+        <div className="relative aspect-[4/5] sm:aspect-square w-full overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-zinc-900/90 via-[#101217] to-zinc-950 p-4 md:p-6 flex items-center justify-center shadow-2xl">
+          {/* Subtle Ambient Studio Glow */}
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(255,255,255,0.08),transparent_70%)]" />
+          
+          <Image
+            src={currentImageSrc}
+            alt={product.name}
+            fill
+            priority
+            sizes="(max-width: 768px) 100vw, 50vw"
+            className="object-contain p-2 transition-transform duration-500 drop-shadow-[0_16px_32px_rgba(0,0,0,0.8)]"
+          />
+
+          {/* Floating Version Tag */}
+          <div className="absolute top-4 left-4 z-10">
+            <span className="inline-flex items-center rounded-full border border-white/15 bg-black/60 backdrop-blur-md px-3 py-1 text-[10px] font-extrabold tracking-wider text-zinc-200 uppercase shadow-md">
+              {product.version[0] ? formatVersionLabel(product.version[0]) : "Official Kit"}
+            </span>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-3">
-          {product.images.slice(0, 2).map((image) => (
-            <div key={image} className="relative h-32 w-full overflow-hidden rounded-xl border border-white/10">
-              <Image
-                src={resolveProductImageSrc(image)}
-                alt={product.name}
-                fill
-                sizes="(max-width: 768px) 50vw, 240px"
-                className="object-cover"
-              />
-            </div>
-          ))}
-        </div>
+
+        {/* Thumbnail Selector Gallery */}
+        {product.images.length > 1 && (
+          <div className="flex gap-3 overflow-x-auto pb-1">
+            {product.images.map((image, idx) => {
+              const isSelected = idx === selectedImageIndex;
+              return (
+                <button
+                  key={image + idx}
+                  type="button"
+                  onClick={() => setSelectedImageIndex(idx)}
+                  className={`relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border transition-all ${
+                    isSelected
+                      ? "border-cyan-400 ring-2 ring-cyan-400/30 bg-zinc-900 shadow-md"
+                      : "border-white/10 bg-zinc-950/80 hover:border-white/30"
+                  }`}
+                >
+                  <Image
+                    src={resolveProductImageSrc(image)}
+                    alt={`${product.name} view ${idx + 1}`}
+                    fill
+                    sizes="80px"
+                    className="object-contain p-1"
+                  />
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       <div className="space-y-5">
