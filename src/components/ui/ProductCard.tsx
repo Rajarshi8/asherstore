@@ -18,15 +18,15 @@ interface ProductCardProps {
 
 function formatVersionLabel(value: string): string {
   const normalized = value.trim().toLowerCase();
-  if (normalized === "sublimation") return "Sublimation Version";
-  if (normalized === "master") return "Master Version";
-  if (normalized === "player") return "Player Version";
+  if (normalized === "sublimation") return "Sublimation";
+  if (normalized === "master") return "Master Edition";
+  if (normalized === "player") return "Player Edition";
   if (normalized === "special-edition" || normalized === "special edition" || normalized === "special edition version") {
-    return "Special Edition Version";
+    return "Special Drop";
   }
-  if (normalized === "clearance" || normalized === "clearance stock") return "Clearance Stock";
+  if (normalized === "clearance" || normalized === "clearance stock") return "Clearance";
   if (normalized === "kids-kit" || normalized === "kids kit") return "Kids Kit";
-  return "Fan Version";
+  return "Fan Edition";
 }
 
 export function ProductCard({ product, imageLoading = "lazy" }: ProductCardProps) {
@@ -37,7 +37,6 @@ export function ProductCard({ product, imageLoading = "lazy" }: ProductCardProps
   const setWishlist = useShopStore((state) => state.setWishlist);
 
   const wished = wishlist.includes(product.id);
-
   const shortName = product.name.replace(" Jersey", "");
 
   async function handleOrderNow() {
@@ -129,69 +128,97 @@ export function ProductCard({ product, imageLoading = "lazy" }: ProductCardProps
     }
   }
 
+  const primaryVersion = product.version[0] ? formatVersionLabel(product.version[0]) : "Official Kit";
+
   return (
     <motion.article
-      whileHover={{ y: -4 }}
-      transition={{ duration: 0.2, ease: "easeOut" }}
-      className="group overflow-hidden rounded-2xl border border-white/10 bg-zinc-950/90"
+      whileHover={{ y: -5 }}
+      transition={{ duration: 0.25, ease: "easeOut" }}
+      className="group flex flex-col justify-between overflow-hidden rounded-2xl border border-white/10 bg-[#0d0e12] transition-all duration-300 hover:border-white/25 hover:shadow-[0_12px_32px_rgba(0,0,0,0.8)]"
     >
-      <Link href={`/products/${product.id}`} className="block">
-        <div className="relative h-60 overflow-hidden bg-zinc-900">
+      {/* Top Image Container */}
+      <div className="relative aspect-[4/4] w-full overflow-hidden bg-gradient-to-b from-zinc-900/80 via-[#101217] to-[#0d0e12] p-3 flex items-center justify-center">
+        {/* Soft Ambient Radial Backlight */}
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(255,255,255,0.07),transparent_70%)]" />
+
+        {/* Floating Top Left Badge */}
+        <div className="absolute top-2.5 left-2.5 z-10">
+          <span className="inline-flex items-center rounded-full border border-white/15 bg-black/60 backdrop-blur-md px-2.5 py-0.5 text-[9px] font-extrabold tracking-wider text-zinc-200 uppercase shadow-sm">
+            {primaryVersion}
+          </span>
+        </div>
+
+        {/* Floating Top Right Wishlist Button */}
+        <button
+          className="absolute top-2.5 right-2.5 z-10 grid h-7 w-7 place-items-center rounded-full border border-white/15 bg-black/50 backdrop-blur-md text-zinc-300 transition-all hover:bg-black/80 hover:text-rose-400 hover:scale-110 active:scale-95"
+          onClick={() => { void handleWishlistToggle(); }}
+          aria-label="Toggle wishlist"
+        >
+          <Heart size={13} className={wished ? "fill-rose-500 text-rose-500" : ""} />
+        </button>
+
+        {/* Uncropped Full Jersey Image */}
+        <Link href={`/products/${product.id}`} className="relative h-full w-full block flex items-center justify-center">
           <Image
             src={resolveProductImageSrc(product.images[0])}
             alt={product.name}
             fill
             loading={imageLoading}
-            sizes="(max-width: 768px) 100vw, 320px"
-            className="object-cover transition duration-500 group-hover:scale-105"
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            className="object-contain p-1.5 transition-transform duration-500 group-hover:scale-105 drop-shadow-[0_10px_20px_rgba(0,0,0,0.65)]"
           />
-          <div className="absolute inset-x-0 bottom-0 h-16 bg-linear-to-t from-black/70 to-transparent" />
-        </div>
-      </Link>
-      <div className="space-y-4 p-4">
-        <div className="flex items-center justify-between text-[11px] uppercase tracking-[0.22em] text-zinc-400">
-          <span>{product.team}</span>
-          <span>{product.version.map(formatVersionLabel).join(" · ")}</span>
-        </div>
-        <Link href={`/products/${product.id}`} className="line-clamp-1 text-2xl leading-tight text-zinc-100">
-          {shortName}
         </Link>
-        <div className="flex items-center justify-between">
-          <p className="text-xl font-semibold text-zinc-100">{formatINR(product.price)}</p>
-          <p className="flex items-center gap-1 text-sm text-amber-300">
-            <Star size={14} className="fill-amber-300" />
-            {product.rating.toFixed(1)} ({product.reviewCount ?? 0})
+      </div>
+
+      {/* Card Details & CTAs */}
+      <div className="flex flex-1 flex-col justify-between p-3.5 space-y-3 bg-[#0d0e12]">
+        <div className="space-y-1">
+          {/* Team Tag */}
+          <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-zinc-400">
+            {product.team}
           </p>
+
+          {/* Product Title */}
+          <Link href={`/products/${product.id}`} className="block group-hover:text-white transition-colors">
+            <h3 className="line-clamp-1 text-sm font-bold text-zinc-100 tracking-tight">
+              {shortName}
+            </h3>
+          </Link>
         </div>
-        <p className="text-xs text-zinc-400">
-          Prepaid only
-        </p>
-        <div className="flex gap-2">
-          <button
-            className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-white/20 bg-white px-3 py-2 text-sm font-semibold text-black transition hover:bg-zinc-200"
-            onClick={() => {
-              addToCart({ productId: product.id, size: "M", qty: 1 });
-              toast.success("Added to cart");
-            }}
-          >
-            <ShoppingCart size={16} /> Add to Cart
-          </button>
-          <button
-            className={`flex flex-1 items-center justify-center gap-2 rounded-lg border border-cyan-400/40 bg-cyan-400/10 px-3 py-2 text-sm font-semibold text-cyan-300 transition hover:bg-cyan-400/20 hover:border-cyan-400/60 disabled:opacity-60`}
-            disabled={ordering}
-            onClick={() => { void handleOrderNow(); }}
-          >
-            <Zap size={16} /> {ordering ? "Placing..." : "Buy Now"}
-          </button>
-          <button
-            className="rounded-lg border border-white/15 px-3 py-2 text-zinc-200 transition hover:border-rose-400"
-            onClick={() => {
-              void handleWishlistToggle();
-            }}
-            aria-label="Toggle wishlist"
-          >
-            <Heart size={16} className={wished ? "fill-rose-500 text-rose-500" : ""} />
-          </button>
+
+        {/* Price & Rating Row */}
+        <div className="space-y-2.5 pt-0.5">
+          <div className="flex items-center justify-between">
+            <p className="text-base font-black text-white tracking-tight">
+              {formatINR(product.price)}
+            </p>
+
+            <div className="flex items-center gap-1 rounded-full border border-amber-400/20 bg-amber-400/10 px-2 py-0.5 text-[10px] font-bold text-amber-300">
+              <Star size={10} className="fill-amber-300 text-amber-300" />
+              <span>{product.rating.toFixed(1)}</span>
+            </div>
+          </div>
+
+          {/* Sleek Dual Action Buttons */}
+          <div className="flex items-center gap-2 pt-0.5">
+            <button
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-white py-2 px-2.5 text-xs font-bold text-black transition-all hover:bg-zinc-200 active:scale-95 shadow-md"
+              onClick={() => {
+                addToCart({ productId: product.id, size: "M", qty: 1 });
+                toast.success("Added to cart");
+              }}
+            >
+              <ShoppingCart size={13} /> Add to Cart
+            </button>
+
+            <button
+              className="flex items-center justify-center gap-1 rounded-xl border border-white/15 bg-white/5 py-2 px-2.5 text-xs font-bold text-zinc-200 transition-all hover:bg-white/10 hover:border-white/30 active:scale-95 disabled:opacity-50"
+              disabled={ordering}
+              onClick={() => { void handleOrderNow(); }}
+            >
+              <Zap size={13} className="text-amber-400 fill-amber-400/20" /> {ordering ? "..." : "Buy"}
+            </button>
+          </div>
         </div>
       </div>
     </motion.article>

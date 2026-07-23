@@ -9,6 +9,7 @@ import { SizePredictor } from "@/components/ui/SizePredictor";
 import { FAQSection } from "@/components/ui/FAQSection";
 import { ProductCard } from "@/components/ui/ProductCard";
 import { SkeletonCard } from "@/components/ui/SkeletonCard";
+import { HeroSection } from "@/components/hero/HeroSection";
 import type { Product } from "@/lib/types";
 
 function ProductStrip({ title, icon, href, apiUrl, emptyMessage }: {
@@ -64,51 +65,12 @@ function ProductStrip({ title, icon, href, apiUrl, emptyMessage }: {
 
 export default function Home() {
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-12 px-4 py-8 md:px-6 md:py-12">
-      <motion.section
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.55 }}
-        className="hero-grid relative overflow-hidden rounded-3xl border border-white/10 bg-zinc-950/80 p-6 md:p-10"
-      >
-        <div className="fade-in-up relative z-10 grid gap-8 md:grid-cols-[1.1fr_1fr] md:items-end">
-          <div className="space-y-8">
-            <p className="inline-flex rounded-full border border-rose-400/30 bg-rose-500/10 px-3 py-1 text-xs uppercase tracking-[0.25em] text-rose-300">
-              Colors On. Game On.
-            </p>
-            <h1 className="max-w-xl text-5xl leading-[0.9] text-zinc-100 md:text-7xl">Not for everyone. For true fans.</h1>
-            <p className="max-w-xl text-base leading-relaxed text-zinc-300 md:text-lg">
-              Real club colors. Real matchday feel. Pick your shirt and wear it like it means something.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <Link
-                href="/category"
-                className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-zinc-200"
-              >
-                Shop Match Kits <ArrowRight size={16} />
-              </Link>
-              <Link
-                href="/dashboard"
-                className="inline-flex items-center gap-2 rounded-xl border border-white/20 px-5 py-3 text-sm font-semibold text-zinc-200"
-              >
-                Track My Orders
-              </Link>
-            </div>
-          </div>
-          <div className="space-y-3">
-            <div className="grid grid-cols-2 gap-3 text-xs text-zinc-300 md:text-sm">
-              <div className="rounded-xl border border-white/10 bg-zinc-900/80 p-4">
-                <Truck className="mb-2 text-rose-400" size={18} />
-                Fast dispatch, clear ETA.
-              </div>
-              <div className="rounded-xl border border-white/10 bg-zinc-900/80 p-4">
-                <ShieldCheck className="mb-2 text-rose-400" size={18} />
-                Secured payments.
-              </div>
-            </div>
-          </div>
-        </div>
-      </motion.section>
+    <div className="flex w-full flex-col">
+      {/* Flagship Dark Hero Section matching reference design */}
+      <HeroSection />
+
+      {/* Main Page Content */}
+      <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-12 px-4 py-8 md:px-6 md:py-12">
 
       <motion.div
         initial={{ opacity: 0, y: 24 }}
@@ -162,6 +124,7 @@ export default function Home() {
       >
         <FAQSection />
       </motion.div>
+      </div>
     </div>
   );
 }

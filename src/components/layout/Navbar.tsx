@@ -13,9 +13,9 @@ import { useShopStore } from "@/store/useShopStore";
 
 const mainNavLinks = [
   { label: "Home", href: "/" },
-  { label: "Shop", href: "/products" },
-  { label: "Category", href: "/category" },
+  { label: "Categories", href: "/category" },
   { label: "About Us", href: "/about-us" },
+  { label: "Contact Us", href: "/contact-us" },
 ];
 
 const mobileNavLinks = mainNavLinks.filter((link) => link.label !== "Home");
@@ -137,21 +137,21 @@ export function Navbar() {
         </nav>
 
         {/* ── Desktop search ── */}
-        <div className="relative hidden w-full max-w-sm md:block">
-          <Search size={14} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
+        <div className="relative hidden w-full max-w-xs lg:max-w-sm md:block">
+          <Search size={14} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500" />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search clubs, jerseys, retro drops..."
-            className="w-full rounded-xl border border-white/10 bg-zinc-900/80 py-2 pl-9 pr-3 text-sm text-zinc-100 outline-none ring-rose-400 transition focus:ring"
+            placeholder="Search jerseys, kits, collections..."
+            className="w-full rounded-full border border-white/20 bg-white/95 py-1.5 pl-9 pr-4 text-xs font-medium text-zinc-900 placeholder-zinc-500 outline-none ring-2 ring-transparent transition-all focus:bg-white focus:ring-white/40 shadow-sm"
           />
           {results.length > 0 ? (
-            <div className="absolute mt-2 w-full rounded-xl border border-white/10 bg-zinc-950 p-2 shadow-2xl">
+            <div className="absolute mt-2 w-full rounded-2xl border border-white/10 bg-zinc-950 p-2 shadow-2xl z-50">
               {results.map((item) => (
                 <Link
                   key={item.id}
                   href={`/products/${item.id}`}
-                  className="block rounded-lg px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-900"
+                  className="block rounded-xl px-3 py-2 text-xs font-medium text-zinc-300 hover:bg-zinc-900 hover:text-white transition-colors"
                   onClick={() => setQuery("")}
                 >
                   {item.name}

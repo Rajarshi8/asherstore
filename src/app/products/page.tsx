@@ -209,11 +209,11 @@ export default function ProductsPage() {
         />
 
         {loading ? (
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, idx) => <SkeletonCard key={idx} />)}
+          <div className="grid gap-4 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            {Array.from({ length: 8 }).map((_, idx) => <SkeletonCard key={idx} />)}
           </div>
         ) : filters.version ? (
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-4 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {items.map((item) => (
               <ProductCard key={item.id} product={item} />
             ))}
@@ -230,7 +230,7 @@ export default function ProductsPage() {
                     <h2 className="text-xl text-zinc-100">{section.label}</h2>
                     <p className="mt-1 text-sm text-zinc-400">{section.description}</p>
                   </div>
-                  <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                  <div className="grid gap-4 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                     {sectionItems.map((item) => (
                       <ProductCard key={item.id} product={item} />
                     ))}
