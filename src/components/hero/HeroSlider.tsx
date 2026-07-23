@@ -85,8 +85,8 @@ export function HeroSlider({
   const slideVariants = {
     initial: (dir: number) => ({
       opacity: 0,
-      x: dir > 0 ? 50 : -50,
-      scale: 0.96,
+      x: dir > 0 ? 60 : -60,
+      scale: 0.95,
     }),
     animate: {
       opacity: 1,
@@ -95,22 +95,22 @@ export function HeroSlider({
     },
     exit: (dir: number) => ({
       opacity: 0,
-      x: dir > 0 ? -50 : 50,
-      scale: 0.96,
+      x: dir > 0 ? -60 : 60,
+      scale: 0.95,
     }),
   };
 
   return (
     <div
-      className="relative w-full overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-zinc-900/40 via-zinc-950/80 to-black/90 p-4 md:p-8 shadow-2xl group"
+      className="relative w-full flex flex-col items-center justify-center group py-2"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      {/* Background Lighting Ambient Glow */}
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_40%,rgba(59,130,246,0.12),transparent_70%)]" />
+      {/* Soft Ambient Radial Backlight in Hero Background */}
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.15),transparent_70%)] blur-3xl" />
 
-      {/* Main Image Display */}
-      <div className="relative aspect-[4/3] w-full md:aspect-[16/10] overflow-hidden rounded-2xl flex items-center justify-center">
+      {/* Main Floating Carousel Display */}
+      <div className="relative aspect-[4/3] w-full md:aspect-[16/11] flex items-center justify-center overflow-hidden">
         <AnimatePresence custom={direction} mode="wait">
           <motion.div
             key={currentSlide.id}
@@ -119,24 +119,35 @@ export function HeroSlider({
             initial="initial"
             animate="animate"
             exit="exit"
-            transition={{ duration: 0.5, ease: "easeOut" }}
+            transition={{ duration: 0.55, ease: "easeOut" }}
             className="relative h-full w-full flex items-center justify-center"
           >
             {!hasImgError ? (
-              <Image
-                src={currentSlide.image}
-                alt={currentSlide.alt}
-                fill
-                priority
-                sizes="(max-width: 768px) 100vw, 50vw"
-                className="object-contain object-center transition-transform duration-700 group-hover:scale-105"
-                onError={() => {
-                  setImgErrors((prev) => ({ ...prev, [currentSlide.id]: true }));
-                }}
-              />
+              <div className="relative h-full w-full flex items-center justify-center">
+                {/* Radial Mask dissolving square image edges into background */}
+                <div
+                  className="relative h-full w-full flex items-center justify-center overflow-hidden"
+                  style={{
+                    maskImage: "radial-gradient(ellipse 65% 70% at 50% 50%, black 20%, transparent 80%)",
+                    WebkitMaskImage: "radial-gradient(ellipse 65% 70% at 50% 50%, black 20%, transparent 80%)",
+                  }}
+                >
+                  <Image
+                    src={currentSlide.image}
+                    alt={currentSlide.alt}
+                    fill
+                    priority
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-contain object-center transition-transform duration-700 group-hover:scale-105"
+                    onError={() => {
+                      setImgErrors((prev) => ({ ...prev, [currentSlide.id]: true }));
+                    }}
+                  />
+                </div>
+              </div>
             ) : (
               /* High-end Styled Fallback Graphic */
-              <div className="flex h-full w-full flex-col items-center justify-center rounded-2xl bg-gradient-to-br from-zinc-900 to-zinc-950 p-8 text-center border border-white/5">
+              <div className="flex h-full w-full flex-col items-center justify-center rounded-3xl bg-zinc-900/30 p-8 text-center border border-white/10 backdrop-blur-xl">
                 <div className="mb-4 grid h-24 w-24 place-items-center rounded-full border border-rose-500/30 bg-rose-500/10 text-rose-400 shadow-[0_0_30px_rgba(244,63,94,0.2)]">
                   <Sparkles size={40} className="animate-pulse" />
                 </div>
@@ -154,10 +165,10 @@ export function HeroSlider({
               </div>
             )}
 
-            {/* Subtle Overlay Badge on image */}
+            {/* Floating Top Badge */}
             {currentSlide.badge && !hasImgError && (
-              <div className="absolute top-4 right-4 z-10">
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-black/60 backdrop-blur-md px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-200 shadow-md">
+              <div className="absolute top-2 right-2 z-20">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-black/60 backdrop-blur-md px-3.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-zinc-200 shadow-xl">
                   <span className="h-1.5 w-1.5 rounded-full bg-rose-500 animate-ping" />
                   {currentSlide.badge}
                 </span>
@@ -165,27 +176,27 @@ export function HeroSlider({
             )}
           </motion.div>
         </AnimatePresence>
+
+        {/* Floating Glassmorphism Navigation Arrows */}
+        <button
+          onClick={handlePrev}
+          aria-label="Previous slide"
+          className="absolute left-1 top-1/2 -translate-y-1/2 z-30 grid h-11 w-11 place-items-center rounded-full border border-white/15 bg-black/50 text-zinc-200 backdrop-blur-md transition hover:bg-white hover:text-black hover:scale-110 active:scale-95 shadow-2xl focus:outline-none"
+        >
+          <ChevronLeft size={22} />
+        </button>
+
+        <button
+          onClick={handleNext}
+          aria-label="Next slide"
+          className="absolute right-1 top-1/2 -translate-y-1/2 z-30 grid h-11 w-11 place-items-center rounded-full border border-white/15 bg-black/50 text-zinc-200 backdrop-blur-md transition hover:bg-white hover:text-black hover:scale-110 active:scale-95 shadow-2xl focus:outline-none"
+        >
+          <ChevronRight size={22} />
+        </button>
       </div>
 
-      {/* Manual Navigation Arrows */}
-      <button
-        onClick={handlePrev}
-        aria-label="Previous slide"
-        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 grid h-10 w-10 place-items-center rounded-full border border-white/15 bg-black/50 text-zinc-200 backdrop-blur-md transition hover:bg-white hover:text-black hover:scale-110 active:scale-95 focus:outline-none"
-      >
-        <ChevronLeft size={20} />
-      </button>
-
-      <button
-        onClick={handleNext}
-        aria-label="Next slide"
-        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 grid h-10 w-10 place-items-center rounded-full border border-white/15 bg-black/50 text-zinc-200 backdrop-blur-md transition hover:bg-white hover:text-black hover:scale-110 active:scale-95 focus:outline-none"
-      >
-        <ChevronRight size={20} />
-      </button>
-
-      {/* Pagination Dot Indicators */}
-      <div className="mt-4 flex items-center justify-center gap-2">
+      {/* Floating Pagination Dot Indicators */}
+      <div className="mt-4 flex items-center justify-center gap-2.5 z-20">
         {slides.map((slide, index) => {
           const isActive = index === currentIndex;
           return (
@@ -195,7 +206,7 @@ export function HeroSlider({
               aria-label={`Go to slide ${index + 1}`}
               className={`h-2 rounded-full transition-all duration-300 ${
                 isActive
-                  ? "w-8 bg-white"
+                  ? "w-8 bg-white shadow-[0_0_12px_rgba(255,255,255,0.8)]"
                   : "w-2 bg-white/30 hover:bg-white/60"
               }`}
             />
