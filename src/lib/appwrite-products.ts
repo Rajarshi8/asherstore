@@ -210,8 +210,38 @@ export async function listBestSellers(limit = 12): Promise<Product[]> {
   }
 }
 
+export async function listInternationalHomeKits(limit = 8): Promise<Product[]> {
+  const cacheKey = `intlHomeKits:${limit}`;
+  const cached = getCachedProducts(cacheKey);
+  if (cached) return cached;
+
+  try {
+    const rows = await listProductDocuments([Query.equal("isBestSeller", true), Query.orderDesc("$createdAt")], limit);
+    const products = await withGenuineReviewStats(rows.map(mapProductDocument).filter((item): item is Product => Boolean(item)));
+    setCachedProducts(cacheKey, products);
+    return products;
+  } catch {
+    return [];
+  }
+}
+
 export async function listMatchdayDeals(limit = 12): Promise<Product[]> {
   const cacheKey = `matchdayDeals:${limit}`;
+  const cached = getCachedProducts(cacheKey);
+  if (cached) return cached;
+
+  try {
+    const rows = await listProductDocuments([Query.equal("isMatchPick", true), Query.orderDesc("$createdAt")], limit);
+    const products = await withGenuineReviewStats(rows.map(mapProductDocument).filter((item): item is Product => Boolean(item)));
+    setCachedProducts(cacheKey, products);
+    return products;
+  } catch {
+    return [];
+  }
+}
+
+export async function listLatestDrops(limit = 8): Promise<Product[]> {
+  const cacheKey = `latestDrops:${limit}`;
   const cached = getCachedProducts(cacheKey);
   if (cached) return cached;
 

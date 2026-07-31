@@ -3,13 +3,20 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, ShieldCheck, Truck, TrendingUp, Flame } from "lucide-react";
+import { ArrowRight, ShieldCheck, Truck } from "lucide-react";
 
 import { SizePredictor } from "@/components/ui/SizePredictor";
 import { FAQSection } from "@/components/ui/FAQSection";
 import { ProductCard } from "@/components/ui/ProductCard";
 import { SkeletonCard } from "@/components/ui/SkeletonCard";
 import { HeroSection } from "@/components/hero/HeroSection";
+import { LatestDropSection } from "@/components/ui/LatestDropSection";
+import { InternationalKitsSection } from "@/components/ui/InternationalKitsSection";
+import { FeaturedCategorySection } from "@/components/ui/FeaturedCategorySection";
+import { ClearanceSaleSection } from "@/components/ui/ClearanceSaleSection";
+import { BrandStorySection } from "@/components/ui/BrandStorySection";
+import { TrustStripSection } from "@/components/ui/TrustStripSection";
+import { SuperiorLineSection } from "@/components/ui/SuperiorLineSection";
 import type { Product } from "@/lib/types";
 
 function ProductStrip({ title, icon, href, apiUrl, emptyMessage }: {
@@ -66,39 +73,34 @@ function ProductStrip({ title, icon, href, apiUrl, emptyMessage }: {
 export default function Home() {
   return (
     <div className="flex w-full flex-col">
-      {/* Flagship Dark Hero Section matching reference design */}
+      {/* Hero */}
       <HeroSection />
 
-      {/* Main Page Content */}
-      <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-12 px-4 py-8 md:px-6 md:py-12">
+      {/* Latest Drop — padded container */}
+      <div className="mx-auto flex w-full max-w-7xl flex-col px-4 md:px-6">
+        <LatestDropSection />
+      </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.55, delay: 0.1 }}
-      >
-        <ProductStrip
-          title="Matchday Deals"
-          icon={<Flame size={20} className="text-rose-400" />}
-          href="/matchday-deals"
-          apiUrl="/api/products/matchday-deals"
-          emptyMessage="No matchday deals available right now. Check back soon."
-        />
-      </motion.div>
+      {/* Full-bleed: Best of International Home Kits */}
+      <InternationalKitsSection />
 
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.55, delay: 0.15 }}
-      >
-        <ProductStrip
-          title="Best Sellers"
-          icon={<TrendingUp size={20} className="text-amber-400" />}
-          href="/products"
-          apiUrl="/api/products/best-sellers"
-          emptyMessage="No best sellers pinned yet."
-        />
-      </motion.div>
+      {/* Full-bleed: Featured Category */}
+      <FeaturedCategorySection />
+
+      {/* Full-bleed: Clearance Sale */}
+      <ClearanceSaleSection />
+
+      {/* Full-bleed: Brand Story */}
+      <BrandStorySection />
+
+      {/* Full-bleed: Trust strip + count-up stats */}
+      <TrustStripSection />
+
+      {/* Full-bleed: Superior Product Line ticker */}
+      <SuperiorLineSection />
+
+      {/* Remaining content — padded container */}
+      <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-12 px-4 pt-12 pb-8 md:px-6 md:pt-16 md:pb-12">
 
       <motion.section
         initial={{ opacity: 0, y: 24 }}
