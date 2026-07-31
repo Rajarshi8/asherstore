@@ -42,5 +42,4 @@ next-env.d.ts
 /.clerk/
 
 # local uploads (served via /api/images or Appwrite Storage in production)
-/public/uploads/*
-!/public/uploads/.gitkeep
+/public/uploads/
