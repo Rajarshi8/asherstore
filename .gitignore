@@ -40,3 +40,7 @@ next-env.d.ts
 
 # clerk configuration (can include secrets)
 /.clerk/
+
+# local uploads (served via /api/images or Appwrite Storage in production)
+/public/uploads/*
+!/public/uploads/.gitkeep
