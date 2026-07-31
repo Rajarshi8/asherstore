@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const resolvedEndpoint =
-  process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT || process.env.APPWRITE_ENDPOINT || "https://nyc.cloud.appwrite.io/v1";
+  process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT ||
+  process.env.APPWRITE_ENDPOINT ||
+  "https://nyc.cloud.appwrite.io/v1";
 
 const endpointUrl = (() => {
   try {
@@ -12,32 +14,31 @@ const endpointUrl = (() => {
 })();
 
 const nextConfig: NextConfig = {
+  output: "standalone",   // 👈 ADD THIS
+
   images: {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "images.unsplash.com"
+        hostname: "images.unsplash.com",
       },
       {
         protocol: "https",
-        hostname: "example.com"
+        hostname: "example.com",
       },
       {
         protocol: endpointUrl.protocol.replace(":", "") as "http" | "https",
-        hostname: endpointUrl.hostname
-      }
-    ]
+        hostname: endpointUrl.hostname,
+      },
+    ],
   },
+
   async headers() {
     return [
       {
-        // Apply to every route.
         source: "/(.*)",
         headers: [
           {
-            // Only allow fonts from our own origin.
-            // This definitively blocks browser-level requests to
-            // assets.appwrite.io before any CORS check can occur.
             key: "Content-Security-Policy",
             value: "font-src 'self' data:;",
           },
