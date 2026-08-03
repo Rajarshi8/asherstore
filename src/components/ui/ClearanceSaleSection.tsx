@@ -63,12 +63,16 @@ function MarqueeRow({
 export function ClearanceSaleSection() {
   return (
     <section className="relative w-full bg-[#0a0a0a] overflow-hidden">
-      {/* ── Dual tilted marquee banners ──────────────────────────── */}
-      <div className="relative w-full overflow-hidden bg-black py-2 space-y-1">
-        {/* Row 1 — tilts up-right, scrolls RIGHT */}
-        <MarqueeRow direction="right" tiltDeg={-3} speed={18} />
-        {/* Row 2 — tilts down-right, scrolls LEFT */}
-        <MarqueeRow direction="left" tiltDeg={3} speed={18} />
+      {/* ── Dual tilted marquee banners (Intersection centered at middle) ── */}
+      <div className="relative w-full h-24 sm:h-28 overflow-hidden bg-black flex items-center justify-center">
+        {/* Row 1 — tilts -2.5deg, scrolls RIGHT */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <MarqueeRow direction="right" tiltDeg={-2.5} speed={18} />
+        </div>
+        {/* Row 2 — tilts +2.5deg, scrolls LEFT */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <MarqueeRow direction="left" tiltDeg={2.5} speed={18} />
+        </div>
       </div>
 
       {/* ── Hero collage ─────────────────────────────────────────── */}
@@ -96,9 +100,12 @@ export function ClearanceSaleSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="text-4xl sm:text-5xl md:text-6xl font-extrabold uppercase tracking-tight text-white leading-none"
+            className="relative text-4xl sm:text-5xl md:text-6xl font-extrabold uppercase tracking-tight text-white leading-none"
           >
-            Clearance Sale
+            <span className="relative inline-block pb-3">
+              Clearance Sale
+              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-1 sm:h-1.5 w-1/2 rounded-full bg-[#b5f23d] shadow-[0_0_12px_rgba(181,242,61,0.6)]" />
+            </span>
           </motion.h2>
 
           <motion.p

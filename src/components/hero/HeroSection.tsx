@@ -23,30 +23,23 @@ export function HeroSection() {
           transition={{ duration: 0.7, ease: "easeOut" }}
           className="flex flex-col items-center text-center space-y-8"
         >
-          {/* Small Luxury Label */}
-          <motion.span
-            initial={{ opacity: 0, letterSpacing: "0.2em" }}
-            animate={{ opacity: 1, letterSpacing: "0.35em" }}
-            transition={{ duration: 0.8, delay: 0.1 }}
-            className="text-xs uppercase tracking-[0.35em] text-zinc-400 font-medium"
-          >
-            THE ASHER STORE
-          </motion.span>
-
-          {/* Main Headline — Full Width, Typographic Impact */}
-          <h1 className="max-w-5xl text-6xl font-extrabold tracking-tight text-white sm:text-7xl md:text-8xl lg:text-9xl leading-[1.0]">
-            <span className="block font-luxury italic font-medium tracking-normal text-zinc-100">
-              Elevate your game,
+          {/* Main Headline — THE ASHER STORE */}
+          <h1 className="relative max-w-6xl text-5xl font-black uppercase tracking-tight text-white sm:text-7xl md:text-8xl lg:text-9xl leading-none">
+            <span className="relative inline-block pb-2">
+              THE ASHER STORE
+              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-1.5 sm:h-2 md:h-2.5 w-1/2 rounded-full bg-rose-500 shadow-[0_0_12px_rgba(244,63,94,0.6)]" />
             </span>
-            <motion.span
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.7, delay: 0.25, ease: "easeOut" }}
-              className="block text-transparent bg-clip-text bg-gradient-to-r from-zinc-100 via-white to-zinc-300 font-sans tracking-tight"
-            >
-              wear the legacy.
-            </motion.span>
           </h1>
+
+          {/* Subheading — Elevate your game, wear the legacy on one line */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.2, ease: "easeOut" }}
+            className="text-base sm:text-2xl md:text-3xl font-medium tracking-normal text-zinc-300 font-luxury italic"
+          >
+            Elevate your game, wear the legacy.
+          </motion.div>
 
           {/* Subtext */}
           <motion.p
