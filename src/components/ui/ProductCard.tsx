@@ -165,7 +165,7 @@ export function ProductCard({ product, imageLoading = "lazy" }: ProductCardProps
             fill
             loading={imageLoading}
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className="object-contain p-1.5 transition-transform duration-500 group-hover:scale-105 drop-shadow-[0_10px_20px_rgba(0,0,0,0.65)]"
+            className="object-contain p-6 sm:p-7 transition-transform duration-500 group-hover:scale-105 drop-shadow-[0_10px_20px_rgba(0,0,0,0.65)]"
           />
         </Link>
       </div>

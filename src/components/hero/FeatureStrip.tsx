@@ -16,8 +16,8 @@ const defaultFeatures: FeatureItem[] = [
   },
   {
     icon: <RotateCcw size={24} className="text-zinc-200" />,
-    title: "100% Money Back",
-    subtitle: "You have 14 days to return",
+    title: "Easy Exchange",
+    subtitle: "Exchange available",
   },
   {
     icon: <Clock size={24} className="text-zinc-200" />,
