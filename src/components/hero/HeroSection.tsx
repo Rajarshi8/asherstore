@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { Play } from "lucide-react";
 
 import { FeatureStrip } from "./FeatureStrip";
 
 export function HeroSection() {
   return (
-    <section className="relative w-full overflow-hidden bg-zinc-950 py-16 md:py-28 text-zinc-100">
+    <section className="relative w-full overflow-hidden bg-zinc-950 pt-14 md:pt-20 pb-4 md:pb-6 text-zinc-100">
       {/* Background radial ambient glow effect */}
       <div className="pointer-events-none absolute left-1/4 top-1/2 -z-0 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-600/12 blur-[140px]" />
       <div className="pointer-events-none absolute right-1/4 top-1/2 -z-0 h-[500px] w-[500px] -translate-y-1/2 rounded-full bg-rose-500/10 blur-[160px]" />
@@ -25,20 +26,20 @@ export function HeroSection() {
         >
           {/* Main Headline — THE ASHER STORE */}
           <h1 className="relative max-w-6xl text-5xl font-black uppercase tracking-tight text-white sm:text-7xl md:text-8xl lg:text-9xl leading-none">
-            <span className="relative inline-block pb-2">
+            <span className="relative inline-block pb-3 sm:pb-4">
               THE ASHER STORE
-              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-1.5 sm:h-2 md:h-2.5 w-1/2 rounded-full bg-rose-500 shadow-[0_0_12px_rgba(244,63,94,0.6)]" />
+              <span className="absolute bottom-0 left-0 w-full h-1.5 sm:h-2 md:h-2.5 rounded-full bg-rose-500 shadow-[0_4px_20px_rgba(244,63,94,0.85),0_0_35px_rgba(244,63,94,0.5)]" />
             </span>
           </h1>
 
-          {/* Subheading — Elevate your game, wear the legacy on one line */}
+          {/* Subheading — Elevate your game, Wear the legacy on one line */}
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.2, ease: "easeOut" }}
             className="text-base sm:text-2xl md:text-3xl font-medium tracking-normal text-zinc-300 font-luxury italic"
           >
-            Elevate your game, wear the legacy.
+            Elevate your game, Wear the legacy.
           </motion.div>
 
           {/* Subtext */}
@@ -66,7 +67,20 @@ export function HeroSection() {
               Shop Now
             </Link>
 
-
+            {/* Watch Video Button */}
+            <button
+              aria-label="Watch Video"
+              onClick={() => {
+                const element = document.getElementById("featured-strip");
+                if (element) {
+                  element.scrollIntoView({ behavior: "smooth" });
+                }
+              }}
+              className="inline-flex items-center justify-center gap-2.5 rounded-full border border-white/20 bg-white/5 px-7 py-3.5 text-sm font-semibold text-white transition-all duration-300 hover:border-white/40 hover:bg-white/10 hover:scale-105 active:scale-95 backdrop-blur-sm cursor-pointer shadow-sm"
+            >
+              <Play size={16} className="fill-white text-white" />
+              <span>Watch Video</span>
+            </button>
           </motion.div>
         </motion.div>
 

@@ -83,7 +83,7 @@ function DropCard({ product, index }: { product: Product; index: number }) {
       className="group flex flex-col overflow-hidden rounded-2xl bg-[#f2f2f0] shadow-lg hover:shadow-2xl transition-all duration-300"
     >
       {/* Jersey image — light cream background, editorial feel */}
-      <Link href={`/products/${product.id}`} className="relative block aspect-[3/4] w-full overflow-hidden bg-[#ececea]">
+      <Link href={`/products/${product.id}`} className="relative block aspect-[4/4] w-full overflow-hidden bg-[#ececea]">
         {/* Subtle vignette at bottom */}
         <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[#e8e8e6]/60 to-transparent z-10" />
 
@@ -92,7 +92,7 @@ function DropCard({ product, index }: { product: Product; index: number }) {
           alt={product.name}
           fill
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          className="object-contain object-center p-4 transition-transform duration-500 group-hover:scale-105 drop-shadow-[0_16px_32px_rgba(0,0,0,0.18)]"
+          className="object-contain object-center p-8 sm:p-10 transition-transform duration-500 group-hover:scale-105 drop-shadow-[0_16px_32px_rgba(0,0,0,0.18)]"
         />
 
         {/* Wishlist button */}
