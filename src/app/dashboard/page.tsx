@@ -297,9 +297,6 @@ export default function DashboardPage() {
 
       <section className="space-y-3 rounded-2xl border border-white/10 bg-zinc-900/70 p-5">
         <h2 className="text-2xl text-zinc-100">Orders</h2>
-        <p className="rounded-lg border border-rose-500/40 bg-rose-950/30 px-3 py-2 text-sm text-rose-200">
-          Due to some technical issues, our payment gateway (Razorpay) is currently not connected to the website. All purchases will be redirected to our official WhatsApp number, where our staff team will confirm your order and assist you further with the process.
-        </p>
         {ordersLoading ? (
           <p className="text-sm text-zinc-400">Loading orders...</p>
         ) : !orders.length ? (
