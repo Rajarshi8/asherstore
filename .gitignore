@@ -43,3 +43,8 @@ next-env.d.ts
 
 # local uploads (served via /api/images or Appwrite Storage in production)
 /public/uploads/
+
+# environment variables (contains secrets — never commit)
+.env
+.env.local
+.env.*.local
