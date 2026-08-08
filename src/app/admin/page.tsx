@@ -23,15 +23,15 @@ interface Product {
   isBestSeller: boolean;
 }
 
-interface Order {
-  id?: string;
-  _id?: string;
-  userId: string;
-  total: number;
-  shippingStatus: "processing" | "packed" | "shipped" | "out_for_delivery" | "delivered";
-  paymentStatus?: "created" | "paid" | "failed";
-  createdAt?: string;
-}
+import { OrderFulfillmentCard } from "@/components/admin/OrderFulfillmentCard";
+import type { ProductionOrder } from "@/types/order";
+import type { ProductionShipment } from "@/types/shipment";
+import { resolveProductImageSrc } from "@/lib/utils";
+
+type Order = ProductionOrder;
+type AppShipment = ProductionShipment;
+
+
 
 interface Analytics {
   totalOrders: number;
@@ -136,6 +136,8 @@ export default function AdminPage() {
   const [imagePreviews, setImagePreviews] = useState<Record<string, string>>({});
   const [productSearch, setProductSearch] = useState("");
 
+  const [shipmentsMap, setShipmentsMap] = useState<Record<string, AppShipment>>({});
+
   async function loadAll() {
     const [productsRes, ordersRes, analyticsRes] = await Promise.all([
       fetch("/api/admin/products", { cache: "no-store" }),
@@ -144,13 +146,15 @@ export default function AdminPage() {
     ]);
 
     const productsJson = (await productsRes.json()) as { products: Product[] };
-    const ordersJson = (await ordersRes.json()) as { orders: Order[] };
+    const ordersJson = (await ordersRes.json()) as { orders: Order[]; shipments?: Record<string, AppShipment> };
     const analyticsJson = (await analyticsRes.json()) as Analytics;
 
     setProducts(productsJson.products || []);
     setOrders(ordersJson.orders || []);
+    setShipmentsMap(ordersJson.shipments || {});
     setAnalytics(analyticsJson);
   }
+
 
   useEffect(() => {
     let active = true;
@@ -335,12 +339,13 @@ export default function AdminPage() {
     await loadAll();
   }
 
-  async function updateOrderStatus(orderId: string, shippingStatus: Order["shippingStatus"]) {
+  async function updateOrderStatus(orderId: string, shipmentStatus: Order["shipmentStatus"]) {
     const res = await fetch(`/api/admin/orders/${orderId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ shippingStatus })
+      body: JSON.stringify({ shipmentStatus })
     });
+
 
     const json = (await res.json()) as { error?: string };
 
@@ -631,51 +636,47 @@ export default function AdminPage() {
             </div>
           </section>
 
-          <section className="overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/60">
-            <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
-              <h2 className="text-xl text-zinc-100">Orders</h2>
-              <p className="text-xs text-zinc-400">Update shipping status</p>
+          <section className="rounded-2xl border border-white/10 bg-zinc-900/60 p-4">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-4">
+              <div>
+                <h2 className="text-xl text-zinc-100">Order Fulfillment & Logistics</h2>
+                <p className="text-xs text-zinc-400">Delhivery API shipment creation, AWBs & tracking</p>
+              </div>
+              <span className="rounded-full bg-cyan-400/20 px-3 py-1 text-xs font-bold text-cyan-300 border border-cyan-400/30">
+                {orders.length} Orders
+              </span>
             </div>
-            <div className="max-h-[360px] overflow-auto">
-              <table className="w-full text-left text-sm">
-                <thead className="bg-zinc-950/80 text-zinc-400">
-                  <tr>
-                    <th className="px-4 py-3">Order ID</th>
-                    <th className="px-4 py-3">User</th>
-                    <th className="px-4 py-3">Total</th>
-                    <th className="px-4 py-3">Status</th>
-                    <th className="px-4 py-3">Update</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {orders.map((order) => {
-                    const orderId = order.id || order._id || "";
-                    return (
-                      <tr key={orderId} className="border-t border-white/10 text-zinc-300">
-                        <td className="px-4 py-3">{orderId}</td>
-                        <td className="px-4 py-3">{order.userId}</td>
-                        <td className="px-4 py-3">Rs {order.total}</td>
-                        <td className="px-4 py-3">{order.shippingStatus}</td>
-                        <td className="px-4 py-3">
-                          <select
-                            defaultValue={order.shippingStatus}
-                            onChange={(e) => updateOrderStatus(orderId, e.target.value as Order["shippingStatus"])}
-                            className="rounded border border-white/20 bg-zinc-950 px-2 py-1"
-                          >
-                            <option value="processing">processing</option>
-                            <option value="packed">packed</option>
-                            <option value="shipped">shipped</option>
-                            <option value="out_for_delivery">out_for_delivery</option>
-                            <option value="delivered">delivered</option>
-                          </select>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+
+            <div className="space-y-4 max-h-[600px] overflow-auto pr-1">
+              {orders.map((order) => {
+                const productNames: Record<string, string> = {};
+                const productImages: Record<string, string> = {};
+
+                (order.products || []).forEach((item) => {
+                  const p = products.find((prod) => prod.id === item.productId);
+                  if (p) {
+                    productNames[item.productId] = p.name;
+                    productImages[item.productId] = resolveProductImageSrc(p.images?.[0]);
+                  }
+                });
+
+
+                return (
+                  <OrderFulfillmentCard
+                    key={order.id}
+                    order={order}
+                    shipment={shipmentsMap[order.id] || null}
+                    productNames={productNames}
+                    productImages={productImages}
+                    onShipped={() => void loadAll()}
+                    onCancelled={() => void loadAll()}
+                  />
+                );
+              })}
+              {!orders.length ? <p className="text-sm text-zinc-400">No orders found.</p> : null}
             </div>
           </section>
+
 
           <section className="rounded-2xl border border-white/10 bg-zinc-900/60 p-4">
             <h2 className="text-xl text-zinc-100">Top Selling Products</h2>

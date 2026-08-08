@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { createOrder, listOrdersByUserId } from "@/lib/appwrite-orders";
+import { createOrderRepo, listOrdersByUserIdRepo } from "@/repositories/orderRepository";
 import { appwriteErrorResponse, getCurrentUser } from "@/lib/appwrite-server";
 
 export const runtime = "nodejs";
@@ -25,7 +25,7 @@ export async function GET() {
   }
 
   try {
-    const rows = await listOrdersByUserId(user.id, 100);
+    const rows = await listOrdersByUserIdRepo(user.id, 100);
     return Response.json({ orders: rows });
   } catch {
     return Response.json({ orders: [] });
@@ -50,14 +50,19 @@ export async function POST(request: Request) {
   }
 
   try {
-    const row = await createOrder({
+    const row = await createOrderRepo({
       userId: user.id,
-      userEmail: user.email,
-      items: parsed.data.items,
+      customerName: user.name || "Customer",
+      customerEmail: user.email,
+      customerPhone: user.phone || "",
+      shippingAddress: null,
+      products: parsed.data.items,
+      subtotal: parsed.data.total,
+      shippingCharge: 99,
+      discount: 0,
       total: parsed.data.total,
-      currency: parsed.data.currency,
       paymentStatus: "created",
-      shippingStatus: "processing",
+      shipmentStatus: "processing",
     });
 
     return Response.json({ order: row }, { status: 201 });

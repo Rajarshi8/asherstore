@@ -7,24 +7,17 @@ import toast from "react-hot-toast";
 import Image from "next/image";
 
 import { ProductCard } from "@/components/ui/ProductCard";
+import { OrderTrackingCard } from "@/components/dashboard/OrderTrackingCard";
+import type { ProductionOrder } from "@/types/order";
 import type { JerseySize, Product, UserProfile } from "@/lib/types";
 import { formatINR, resolveProductImageSrc } from "@/lib/utils";
 import { useClerk } from "@clerk/nextjs";
 import { useShopStore } from "@/store/useShopStore";
 
-interface DashboardOrder {
-  id: string;
-  total: number;
-  shippingStatus: string;
-  paymentStatus: string;
-  createdAt: string;
-  items?: Array<{
-    productId: string;
-    size: JerseySize;
-    qty: number;
-    price: number;
-  }>;
-}
+type DashboardOrder = ProductionOrder;
+
+
+
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -302,54 +295,12 @@ export default function DashboardPage() {
         ) : !orders.length ? (
           <p className="text-sm text-zinc-400">No items found.</p>
         ) : (
-          <div className="space-y-3">
-            {orders.map((order) => {
-              const orderItems = order.items || [];
-
-              return (
-                <article key={order.id} className="rounded-xl border border-white/10 bg-zinc-950/70 p-4">
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div>
-                      <p className="text-sm text-zinc-300">Order: {order.id}</p>
-                      <p className="text-xs text-zinc-500">
-                        Placed: {new Date(order.createdAt).toLocaleString()}
-                      </p>
-                    </div>
-                    <div className="text-right text-xs text-zinc-400">
-                      <p>Status: {order.shippingStatus}</p>
-                      <p>Payment: {order.paymentStatus}</p>
-                      <p className="text-sm text-zinc-200">Total: {formatINR(order.total)}</p>
-                    </div>
-                  </div>
-
-                  {orderItems.length ? (
-                    <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                      {orderItems.map((item) => {
-                        const product = catalog.find((entry) => entry.id === item.productId);
-                        const imageSrc = resolveProductImageSrc(product?.images?.[0]);
-                        const name = product?.name || item.productId;
-
-                        return (
-                          <div key={`${order.id}-${item.productId}-${item.size}`} className="flex gap-3 rounded-lg border border-white/10 bg-zinc-900/60 p-3">
-                            <div className="relative h-16 w-16 overflow-hidden rounded-lg border border-white/10">
-                              <Image src={imageSrc} alt={name} fill sizes="64px" className="object-cover" />
-                            </div>
-                            <div className="flex-1">
-                              <p className="text-sm text-zinc-100">{name}</p>
-                              <p className="text-xs text-zinc-400">Size {item.size} · Qty {item.qty}</p>
-                              <p className="text-xs text-zinc-300">{formatINR(item.price * item.qty)}</p>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <p className="mt-3 text-xs text-zinc-500">No item details available for this order.</p>
-                  )}
-                </article>
-              );
-            })}
+          <div className="space-y-4">
+            {orders.map((order) => (
+              <OrderTrackingCard key={order.id} order={order} catalog={catalog} />
+            ))}
           </div>
+
         )}
       </section>
 

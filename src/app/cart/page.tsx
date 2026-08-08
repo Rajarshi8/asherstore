@@ -28,9 +28,23 @@ export default function CartPage() {
   const [payState, setPayState] = useState<PayState>("idle");
   const [scriptReady, setScriptReady] = useState(false);
 
+  // Shipping Address Form State
+  const [addressForm, setAddressForm] = useState({
+    name: "",
+    phone: "",
+    addressLine1: "",
+    addressLine2: "",
+    city: "",
+    state: "",
+    pincode: "",
+  });
+  const [pincodeChecking, setPincodeChecking] = useState(false);
+  const [pincodeServiceable, setPincodeServiceable] = useState<boolean | null>(null);
+
   const SHIPPING_CHARGE = 99;
   const PROMO_CODE_DISCOUNT_RATE = 0.1;
   const VALID_PROMO_CODES = ["ASHER10", "JERSEY10", "WELCOME10"];
+
 
   useEffect(() => {
     let active = true;
@@ -91,6 +105,51 @@ export default function CartPage() {
     setPromoCodeInput("");
   }
 
+  // Auto-fill user name/phone if profile exists
+  useEffect(() => {
+    if (user) {
+      setAddressForm((prev) => ({
+        ...prev,
+        name: prev.name || user.name || "",
+        phone: prev.phone || user.phone || "",
+      }));
+    }
+  }, [user]);
+
+  async function handleCheckPincode(pin: string) {
+    if (pin.length !== 6) {
+      setPincodeServiceable(null);
+      return;
+    }
+    setPincodeChecking(true);
+    try {
+      const res = await fetch("/api/delhivery/serviceability", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pincode: pin }),
+      });
+      const json = (await res.json()) as { isServiceable?: boolean; city?: string; state?: string };
+      if (json.isServiceable) {
+        setPincodeServiceable(true);
+        if (json.city) {
+          setAddressForm((prev) => ({
+            ...prev,
+            city: prev.city || json.city || "",
+            state: prev.state || json.state || "",
+          }));
+        }
+        toast.success(`Delhivery delivers to ${pin} (${json.city || ""})`);
+      } else {
+        setPincodeServiceable(false);
+        toast.error(`Pincode ${pin} is not currently serviceable by Delhivery.`);
+      }
+    } catch {
+      setPincodeServiceable(null);
+    } finally {
+      setPincodeChecking(false);
+    }
+  }
+
   // ── Razorpay checkout ────────────────────────────────────────────────────
   const handleOrderNow = useCallback(async () => {
     if (!user) {
@@ -102,6 +161,34 @@ export default function CartPage() {
       toast.error("Payment gateway is loading, please try again in a moment.");
       return;
     }
+
+    // Address validation with explicit field messages
+    const { name, phone, addressLine1, city, state, pincode } = addressForm;
+    if (!name.trim()) {
+      toast.error("Please enter your Full Name.");
+      return;
+    }
+    if (!phone.trim() || phone.trim().length < 10) {
+      toast.error("Please enter a valid 10-digit Phone Number.");
+      return;
+    }
+    if (!addressLine1.trim()) {
+      toast.error("Please enter your Street Address.");
+      return;
+    }
+    if (!pincode.trim() || pincode.trim().length !== 6) {
+      toast.error("Please enter a valid 6-digit Pincode.");
+      return;
+    }
+    if (!city.trim()) {
+      toast.error("Please enter your City.");
+      return;
+    }
+    if (!state.trim()) {
+      toast.error("Please enter your State.");
+      return;
+    }
+
 
     const pricedItems = detailed
       .map((entry) => {
@@ -121,6 +208,7 @@ export default function CartPage() {
       return;
     }
 
+
     // Step 1 — Create Razorpay order via backend
     setPayState("creating-order");
     let orderId: string;
@@ -134,8 +222,11 @@ export default function CartPage() {
         body: JSON.stringify({
           items: pricedItems.map((i) => ({ productId: i.productId, size: i.size, qty: i.qty })),
           currency: "INR",
+          shippingCharge: shippingCharge,
+          promoCode: appliedPromoCode,
         }),
       });
+
 
       const json = (await res.json()) as {
         orderId?: string;
@@ -193,7 +284,22 @@ export default function CartPage() {
               razorpay_signature: response.razorpay_signature,
               items: pricedItems.map((i) => ({ productId: i.productId, size: i.size, qty: i.qty })),
               currency: "INR",
+              shippingCharge: shippingCharge,
+              promoCode: appliedPromoCode,
+              phone: addressForm.phone,
+              shippingAddress: {
+                name: addressForm.name,
+                phone: addressForm.phone,
+                addressLine1: addressForm.addressLine1,
+                addressLine2: addressForm.addressLine2,
+                city: addressForm.city,
+                state: addressForm.state,
+                pincode: addressForm.pincode,
+                country: "India",
+              },
             }),
+
+
           });
 
           const verifyJson = (await verifyRes.json()) as {
@@ -223,7 +329,8 @@ export default function CartPage() {
     });
 
     rzp.open();
-  }, [clearCart, detailed, finalTotal, router, scriptReady, user]);
+  }, [addressForm, clearCart, detailed, finalTotal, router, scriptReady, user]);
+
 
   const isLoading = payState === "creating-order" || payState === "verifying";
 
@@ -310,10 +417,88 @@ export default function CartPage() {
           </section>
 
           {/* Order Summary */}
-          <aside className="h-fit rounded-2xl border border-white/10 bg-zinc-900/70 p-5">
-            <p className="text-sm text-zinc-400">Subtotal</p>
-            <p className="mt-1 text-3xl font-semibold text-zinc-100">{formatINR(subtotal)}</p>
-            <p className="mt-2 text-sm text-zinc-400">Shipping: {formatINR(shippingCharge)}</p>
+          <aside className="h-fit rounded-2xl border border-white/10 bg-zinc-900/70 p-5 space-y-4">
+            {/* Delivery Address Form */}
+            <div className="rounded-xl border border-white/10 bg-zinc-950/60 p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="text-xs uppercase tracking-[0.2em] font-semibold text-cyan-300">
+                  Shipping Address
+                </p>
+                {pincodeChecking ? (
+                  <span className="text-[10px] text-zinc-400 animate-pulse">Checking pin...</span>
+                ) : pincodeServiceable === true ? (
+                  <span className="text-[10px] font-semibold text-emerald-400">✓ Serviceable</span>
+                ) : pincodeServiceable === false ? (
+                  <span className="text-[10px] font-semibold text-rose-400">✕ Unserviceable</span>
+                ) : null}
+              </div>
+
+              <div className="space-y-2">
+                <input
+                  type="text"
+                  placeholder="Full Name *"
+                  value={addressForm.name}
+                  onChange={(e) => setAddressForm((p) => ({ ...p, name: e.target.value }))}
+                  className="w-full rounded-lg border border-white/10 bg-zinc-950 px-3 py-2 text-xs text-zinc-100 placeholder-zinc-500 outline-none focus:border-cyan-400/50"
+                />
+                <input
+                  type="tel"
+                  placeholder="10-digit Phone Number *"
+                  value={addressForm.phone}
+                  onChange={(e) => setAddressForm((p) => ({ ...p, phone: e.target.value }))}
+                  className="w-full rounded-lg border border-white/10 bg-zinc-950 px-3 py-2 text-xs text-zinc-100 placeholder-zinc-500 outline-none focus:border-cyan-400/50"
+                />
+                <input
+                  type="text"
+                  placeholder="House / Street / Area *"
+                  value={addressForm.addressLine1}
+                  onChange={(e) => setAddressForm((p) => ({ ...p, addressLine1: e.target.value }))}
+                  className="w-full rounded-lg border border-white/10 bg-zinc-950 px-3 py-2 text-xs text-zinc-100 placeholder-zinc-500 outline-none focus:border-cyan-400/50"
+                />
+                <input
+                  type="text"
+                  placeholder="Landmark / Apartment (Optional)"
+                  value={addressForm.addressLine2}
+                  onChange={(e) => setAddressForm((p) => ({ ...p, addressLine2: e.target.value }))}
+                  className="w-full rounded-lg border border-white/10 bg-zinc-950 px-3 py-2 text-xs text-zinc-100 placeholder-zinc-500 outline-none focus:border-cyan-400/50"
+                />
+                <div className="grid grid-cols-2 gap-2">
+                  <input
+                    type="text"
+                    placeholder="City *"
+                    value={addressForm.city}
+                    onChange={(e) => setAddressForm((p) => ({ ...p, city: e.target.value }))}
+                    className="w-full rounded-lg border border-white/10 bg-zinc-950 px-3 py-2 text-xs text-zinc-100 placeholder-zinc-500 outline-none focus:border-cyan-400/50"
+                  />
+                  <input
+                    type="text"
+                    placeholder="State *"
+                    value={addressForm.state}
+                    onChange={(e) => setAddressForm((p) => ({ ...p, state: e.target.value }))}
+                    className="w-full rounded-lg border border-white/10 bg-zinc-950 px-3 py-2 text-xs text-zinc-100 placeholder-zinc-500 outline-none focus:border-cyan-400/50"
+                  />
+                </div>
+                <input
+                  type="text"
+                  maxLength={6}
+                  placeholder="6-digit Pincode *"
+                  value={addressForm.pincode}
+                  onChange={(e) => {
+                    const pin = e.target.value.replace(/\D/g, "");
+                    setAddressForm((p) => ({ ...p, pincode: pin }));
+                    if (pin.length === 6) void handleCheckPincode(pin);
+                  }}
+                  className="w-full rounded-lg border border-white/10 bg-zinc-950 px-3 py-2 text-xs text-zinc-100 placeholder-zinc-500 outline-none focus:border-cyan-400/50"
+                />
+              </div>
+            </div>
+
+            <div>
+              <p className="text-sm text-zinc-400">Subtotal</p>
+              <p className="mt-1 text-3xl font-semibold text-zinc-100">{formatINR(subtotal)}</p>
+              <p className="mt-2 text-sm text-zinc-400">Shipping: {formatINR(shippingCharge)}</p>
+            </div>
+
 
             {/* Promo Code */}
             <div className="mt-4 rounded-lg border border-white/10 bg-zinc-950/60 p-3">

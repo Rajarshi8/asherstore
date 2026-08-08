@@ -27,12 +27,21 @@ export type PricedCheckoutItem = {
 
 export type PricedCheckoutSummary = {
   pricedItems: PricedCheckoutItem[];
+  subtotal: number;
+  shippingCharge: number;
+  discountAmount: number;
   totalRupees: number;
   totalPaise: number;
 };
 
+const VALID_PROMO_CODES = ["ASHER10", "JERSEY10", "WELCOME10"];
+
 export async function priceCheckoutItems(
-  items: CheckoutItemInput[]
+  items: CheckoutItemInput[],
+  options?: {
+    shippingCharge?: number;
+    promoCode?: string | null;
+  }
 ): Promise<PricedCheckoutSummary> {
   const parsedItems = checkoutItemsSchema.parse(items);
 
@@ -57,11 +66,21 @@ export async function priceCheckoutItems(
     })
   );
 
-  const totalRupees = pricedItems.reduce((sum, item) => sum + item.price * item.qty, 0);
+  const subtotal = pricedItems.reduce((sum, item) => sum + item.price * item.qty, 0);
+  const shippingCharge = pricedItems.length ? (options?.shippingCharge ?? 99) : 0;
+
+  const code = (options?.promoCode || "").trim().toUpperCase();
+  const discountRate = VALID_PROMO_CODES.includes(code) ? 0.1 : 0;
+  const discountAmount = Math.round((subtotal + shippingCharge) * discountRate);
+
+  const totalRupees = Math.max(0, subtotal + shippingCharge - discountAmount);
   const totalPaise = Math.round(totalRupees * 100);
 
   return {
     pricedItems,
+    subtotal,
+    shippingCharge,
+    discountAmount,
     totalRupees,
     totalPaise,
   };

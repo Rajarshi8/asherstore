@@ -10,6 +10,8 @@ export const runtime = "nodejs";
 const schema = z.object({
   items: checkoutItemsSchema,
   currency: z.literal("INR").default("INR"),
+  shippingCharge: z.number().optional().default(99),
+  promoCode: z.string().nullable().optional(),
 });
 
 export async function POST(request: Request) {
@@ -37,7 +39,10 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { totalPaise } = await priceCheckoutItems(parsed.data.items);
+    const { totalPaise } = await priceCheckoutItems(parsed.data.items, {
+      shippingCharge: parsed.data.shippingCharge,
+      promoCode: parsed.data.promoCode,
+    });
 
     const order = await createRazorpayOrder(razorpayConfig, {
       amount: totalPaise,
